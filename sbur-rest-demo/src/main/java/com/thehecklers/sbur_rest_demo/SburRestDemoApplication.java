@@ -29,31 +29,29 @@ public class SburRestDemoApplication {
 }
 
 class Coffee {
+    private String id;
+    private String name;
 
-	private final String id;
-	private String name;
+    // 1. Default Constructor (Required for JSON/Jackson)
+    public Coffee() {
+        this.id = UUID.randomUUID().toString();
+    }
 
-	public Coffee(String id, String name) {
-		this.id = id;
-		this.name = name;
-	}
+    // 2. Name-only Constructor (Fixes your compilation errors)
+    public Coffee(String name) {
+        this(UUID.randomUUID().toString(), name);
+    }
 
-	public Coffee(String name) {
-		this(UUID.randomUUID().toString(), name);
-	}
+    // 3. Full Constructor (For manual ID setting)
+    public Coffee(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
-	public String getId() {
-		return id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
+    // Getters and Setters...
+    public String getId() { return id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 }
 
 @RestController
@@ -87,8 +85,11 @@ class RestApiDemoController {
 
 	@PostMapping
 	Coffee postCoffee(@RequestBody Coffee coffee) {
-		coffees.add(coffee);
-		return coffee;
+		Coffee coffeeToSave = (coffee.getId() == null) 
+			? new Coffee(coffee.getName()) 
+			: coffee;
+		coffees.add(coffeeToSave);
+		return coffeeToSave;
 	}
 
 	@PutMapping("/{id}")
